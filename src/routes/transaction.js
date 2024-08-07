@@ -1,5 +1,6 @@
 import db from "../config/db.js";
 
+// add new transaction
 async function addTransaction(request, h) {
   try {
     var payload = request.payload;
@@ -44,6 +45,7 @@ async function addTransaction(request, h) {
   }
 }
 
+// update transactions, based on the SKU, it will re-calculate the stock and update the stock accordingly based on the request quantity or change the product in the current transaction completely if a different SKU are given in the request
 async function updateTransaction(request, h) {
   try {
     var payload = request.payload;
@@ -177,6 +179,7 @@ async function updateTransaction(request, h) {
   }
 }
 
+// get all transactions with paginations
 async function getTransactions(request, h) {
   try {
     var params = request.query;
@@ -211,6 +214,7 @@ async function getTransactions(request, h) {
   }
 }
 
+// get transaction detail
 async function getTransactionsByID(request, h) {
   try {
     let query = `SELECT t.id, p.sku, t.quantity, t.amount FROM transactions t LEFT JOIN products p ON p.id = t.product_id WHERE t.deleted_at IS NULL AND t.id = ${request.params.id}`;
@@ -231,6 +235,7 @@ async function getTransactionsByID(request, h) {
   }
 }
 
+// Delete transaction and restore the stock that has been allocated for that transaction
 async function deleteTransaction(request, h) {
   try {
     await db.query("BEGIN");

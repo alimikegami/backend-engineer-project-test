@@ -4,6 +4,7 @@ import fs from "fs";
 import Path from "path";
 import { v4 as uuidv4 } from "uuid";
 
+// get all products with pagination
 async function getProducts(request, h) {
   try {
     var params = request.query;
@@ -37,6 +38,7 @@ async function getProducts(request, h) {
   }
 }
 
+// get product details by ID
 async function getProductDetails(request, h) {
   try {
     let query = `SELECT id, sku, price, title, stock, created_at, description FROM products WHERE id = ${request.params.id} AND deleted_at IS NULL`;
@@ -47,7 +49,7 @@ async function getProductDetails(request, h) {
         .response({ success: false, message: "data not found" })
         .code(404);
     }
-    
+
     const data = res.rows[0];
 
     query = `SELECT image_url FROM product_images WHERE product_id = ${request.params.id} AND deleted_at IS NULL`;
@@ -68,6 +70,7 @@ async function getProductDetails(request, h) {
   }
 }
 
+// delete products and delete the transactions for that product
 async function deleteProduct(request, h) {
   try {
     await db.query("BEGIN");
@@ -98,6 +101,7 @@ async function deleteProduct(request, h) {
   }
 }
 
+// add new product
 async function createProduct(request, h) {
   try {
     const payload = request.payload;
@@ -137,6 +141,7 @@ async function createProduct(request, h) {
     // store uploaded file in uploads dir. For this test, I will store the image locally on the project directory.
     // on production level, cloud storage should be used to store the image, not in the database or the app dir
     const promises = files.map((file) => {
+      // this file upload section was assisted by chatgpt -- author notes
       const ext = file.hapi.filename.split(".").pop();
       const filename = uuidv4() + "." + ext;
       const filePath = Path.join(uploadDir, filename);
@@ -191,6 +196,7 @@ async function createProduct(request, h) {
   }
 }
 
+// populate the product with dummyjson API
 async function insertDummyProduct(request, h) {
   try {
     const response = await axios.get("https://dummyjson.com/products");
